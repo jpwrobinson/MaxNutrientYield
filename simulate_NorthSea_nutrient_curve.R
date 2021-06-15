@@ -1,7 +1,7 @@
-pacman::p_load(mizer, tidyverse, skimr, cowplot, here, funk, install=FALSE)
+pacman::p_load(mizer, tidyverse, skimr, cowplot, here, funk, install=TRUE)
 theme_set(theme_bw())
 
-## Simulate nutrient yield curves for North Sea fisheries
+## Goal: simulate North Sea community under historic fishing pressure
 
 # Reference guides:
 # https://github.com/sizespectrum/mizer
@@ -52,8 +52,8 @@ for(i in 1:length(f)){
               Whiting = f[i], Sole = f[i], Gurnard = f[i], Plaice = f[i], Haddock = f[i],
               Cod = f[i], Saithe = f[i])
     
-    ## setup 89 years of fishing at the fixed f level (to equilbrium at 2100)
-    scenario2 <- t(array(f.run, dim=c(12,90), dimnames=list(NULL,year = 2011:2100)))
+    ## setup 89 years of fishing at the fixed f level (to equilbrium at 2050)
+    scenario2 <- t(array(f.run, dim=c(12,90), dimnames=list(NULL,year = 2011:2050)))
     
     # add historic effort up to 2010, 
     # then linearly shift towards f.run levels from 2010-2015
@@ -102,7 +102,7 @@ for(i in 1:length(f)){
     
     ## save mean weight
     w<-getMeanWeight(sim2, min_w = 10, max_w = 100e3) %>% last()
-    w<-data.frame(mean_weight = w, year=2100, f = f[i])
+    w<-data.frame(mean_weight = w, year=2050, f = f[i])
     
     ## save total catch (yield)
     y<-data.frame(getYield(sim2))

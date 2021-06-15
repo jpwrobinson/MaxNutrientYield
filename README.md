@@ -1,11 +1,10 @@
 # MaxNutrientYield
-R scripts and model simulations accompanying Robinson et al. (submitted).
+R scripts and model simulations accompanying Robinson et al. Managing Fisheries for Maximum Nutrient Yield (submitted June 2021).
 
 This manuscript was produced using the following packages
 
 
 ```
-
 R version 4.0.2 (2020-06-22)
 Platform: x86_64-apple-darwin17.0 (64-bit)
 
