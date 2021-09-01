@@ -15,17 +15,27 @@ nutrients<-read.csv(file = 'nutrient_profiles.csv')
 
 ## load calibrated North Sea model
 load(file = 'NorthSea_calibrated.rds')
-# load(file = 'NorthSea_mizer_parameters.rds')
 
 
-## set an effort matrix based on North Sea mortality history 
-relative_effort<-f_history
-initial_effort <- matrix(relative_effort[1, ], byrow = TRUE, nrow = 100,
-                         ncol = ncol(relative_effort), dimnames = list(1867:1966))
-relative_effort <- rbind(initial_effort, relative_effort)
+##clean some params
+params@gear_params$initial_effort<-NULL
+
+### set starting effort position = time-averaged 2000-10
+calib_years<-c(2000:2010)
+start_effort<-t(as.matrix(colMeans(subset(effort, rownames(effort) %in% calib_years))))
+rownames(start_effort)<-'2010'
+
 
 ## set up range of fishing effort
-f=seq(0, 12, 0.2)
+f=seq(0, 3, 0.05)
+
+### set starting effort position = time-averaged 2000-10
+calib_years<-c(2000:2010)
+start_effort<-t(as.matrix(colMeans(subset(effort, rownames(effort) %in% calib_years))))
+rownames(start_effort)<-'2010'
+
+## get F baseline as average last 20 years
+f_base<-start_effort
 
 ## set up unfished biomass for stock collapse definition
 unfished <- project(params, effort = 0, dt = 0.25, t_save = 1, t_max=100)
@@ -57,10 +67,10 @@ for(i in 1:length(f)){
     
     # add historic effort up to 2010, 
     # then linearly shift towards f.run levels from 2010-2015
-    scenario2 <- rbind(relative_effort, scenario2)
+    scenario2 <- rbind(start_effort, scenario2)
     for (sp in dimnames(scenario2)[[2]]){
-      scenario2[as.character(2011:2015),sp] <- scenario2["2010",sp] +
-        (((scenario2["2015",sp] - scenario2["2010",sp]) / 5) * 1:5)
+      scenario2[as.character(2011:2020),sp] <- scenario2["2010",sp] +
+        (((scenario2["2020",sp] - scenario2["2010",sp]) / 10) * 1:10)
     }
     
     ## run simulation
