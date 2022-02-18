@@ -1,5 +1,9 @@
 # MaxNutrientYield
-R scripts and model simulations accompanying Robinson et al. Managing Fisheries for Maximum Nutrient Yield (submitted June 2021).
+R scripts and model simulations accompanying Robinson et al. Managing Fisheries for Maximum Nutrient Yield. 2022. *Fish & Fisheries*. doi: 10.111/faf.12649.
+
+https://onlinelibrary.wiley.com/doi/10.1111/faf.12649
+
+Run numbered R scripts (01.., 02) for model simulations. Figures 1 and 2 can be recreated using objects in [NorthSea_mMNY_simulated.rds](NorthSea_mMNY_simulated.rds) and [BalticSea_mMNY_simulated.rds](BalticSea_mMNY_simulated.rds).
 
 This manuscript was produced using the following packages
 
