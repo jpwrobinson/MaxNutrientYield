@@ -1,31 +1,32 @@
-
 library(tidyverse)
 library(scales)
 library(patchwork)
 
+## Goal: simulate nutrient yields for generic 10 species community
 
-source('baseparameters.R')
-source('compareBiomass.R')
-source('calcSSB.R')
-source('IterateSpectrum.R')
-source('calcFishedBiomass.R')
-source('plotBiomasstime.R')
-source('YieldCalc.R')
+source('BalticSea_R/baseparameters.R')
+source('BalticSea_R/compareBiomass.R')
+source('BalticSea_R/calcSSB.R')
+source('BalticSea_R/IterateSpectrum.R')
+source('BalticSea_R/calcFishedBiomass.R')
+source('BalticSea_R/plotBiomasstime.R')
+source('BalticSea_R/YieldCalc.R')
 
+
+## set parameters for 10 species case
 W <- 10^seq(log10(30),log10(15000),length.out = 15) # 10 species in logspace 
 param0 <- baseparameters(W,kappa = 0.005,h = 15)
 param0$F0 <- rep(0,param0$nSpecies)
 param0$fishing <- "Trawl" # See "fishing.R" for definitions
 param0$eRepro <- 0.05
-# Need to make some productivity changes in the generic model parameterization compared to the baltic 
 param0$mu0prefactor <- 2
 param0$mu0exponent <- -1/4
 param0$ks <- 0.2*param$h;         # Activity
 
-
+## run model to equilibrium
 SF0 <- IterateSpectrum(param0,S=NA)
 
-
+## setup F multiplier for yield curves
 Fsim <- seq(0,3,length.out = 30)
 
 df.export <- data.frame(F0 = Fsim, Yield = NA, cspecies = 0, meanWinf = NA, biomass = NA,
@@ -33,19 +34,17 @@ df.export <- data.frame(F0 = Fsim, Yield = NA, cspecies = 0, meanWinf = NA, biom
                         nut.under = NA,
                         nut.over = NA)
 
-# Get james nutrient data (generic case)
+# Get generic nutrient data
 nutrients <- read.table('JPWR_nutrients.txt', header = TRUE)
 nutrients$wInf <- .01*nutrients$Lmax^3
 
 ## add nutrients approx to yield (random nutrients)
 nutrients$nutrient_conc_equal<-runif(10, 0, 1)
 
-# Create generic fucntion for nutrients 
-
+# Create generic function for nutrients 
 nut.under <- lm(nutrient_conc_underfishing ~ wInf, data = nutrients)
 nut.over <- lm(nutrient_conc_overfishing ~ wInf, data = nutrients)
 nut.equal <- lm(nutrient_conc_equal ~ wInf, data = nutrients)
-
 
 for(i in 1:length(Fsim)){
   
@@ -66,7 +65,6 @@ for(i in 1:length(Fsim)){
   
   # Relative biomass 
   bio.rel <- SF$Biomass[param$tEnd/param$dt,]/SF0$Biomass[param0$tEnd/param0$dt,]
-  
   
   df.export$Yield[i] <- sum(YieldCalc(param, SF))
   df.export$cspecies[i] <- length(which(bio.rel < 0.2))
@@ -92,34 +90,24 @@ df.pp$nut.under <- df.pp$nut.under/max(df.pp$nut.under)
 df.pp$nut.over <- df.pp$nut.over/max(df.pp$nut.over)
 df.pp$nut.equal <- df.pp$nut.equal/max(df.pp$nut.equal)
 
-write.csv(df.pp, file = '../../data/generic_model.csv', row.names=FALSE)
+write.csv(df.pp, file = 'generic_model.csv', row.names=FALSE)
 
 
+## plot
 df.plot <- df.pp %>% pivot_longer(2:6)
-
 
 p1 <- ggplot(df.plot[-which(df.plot$name == 'exploit'),], aes(x = F0, y = value/max(value), group = name, color = name))+geom_line(size = 1.4)+
   theme_classic()+scale_y_continuous('proportion of maximum')+scale_x_continuous('')+
   theme(legend.position = 'top')
 
-
-p1
-
-# Nutrient plots 
-
-
 p2 <- ggplot(df.pp, aes(x = F0, y = nut.under))+geom_line(size = 1.4)+geom_line(aes(y = Yield), col = 'red',size = 1.4)+theme_classic()+
   scale_x_continuous('ecosystem exploitation')+scale_y_continuous('')
-p2
 
 p3 <- ggplot(df.pp, aes(x = F0, y = nut.over))+geom_line(size = 1.4)+geom_line(aes(y = Yield), col = 'red', size = 1.4)+theme_classic()+
   scale_x_continuous('')+scale_y_continuous('')
-p3
 
-
-png(file = 'theoretical_model.png', width = 16, height = 16, res = 400, units = 'cm')
 p1/(p2+p3)
-dev.off()
+
 
 
 

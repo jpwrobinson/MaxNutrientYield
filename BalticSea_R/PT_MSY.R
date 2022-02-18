@@ -7,6 +7,7 @@ dyn.load('schaefer_biomass')
 load('Baltic_timeseries.Rdata') # Load data used in Jacobsen 2016
 
 
+
 for(i in 1:length(baltic_timeseries)){
   
   
@@ -54,7 +55,11 @@ for(i in 1:length(baltic_timeseries)){
   # 
   # 
   
+<<<<<<< HEAD
+  opt<-nlminb(obj$par,obj$fn,obj$gr,lower=lower,upper=upper, 
+=======
   opt<-nlminb(obj$par,obj$fn,obj$gr,lower=lower,upper=upper,  # Minimize the loglikelihood to get population parameters
+>>>>>>> fdb87d2bdf3169be8261415ed1cd3e3d01094d5f
               control = list(iter.max = 1e5,
                              eval.max = 1e5), silent = TRUE) #
   
@@ -75,13 +80,21 @@ for(i in 1:length(baltic_timeseries)){
   r <- exp(rep$par.fixed)[1]
   m <- exp(parms$logm)
   
+<<<<<<< HEAD
+  
+=======
   # Calculate MSY and Bmsy
+>>>>>>> fdb87d2bdf3169be8261415ed1cd3e3d01094d5f
   MSY <- r*K/((m+1)^(1/m))
   Bmsy <- K/((m+1)^(1/m))
   
 
+<<<<<<< HEAD
+
+=======
   print(Bmsy/K)
   
+>>>>>>> fdb87d2bdf3169be8261415ed1cd3e3d01094d5f
     if(i == 1){
     df <- data.frame(S0 = K,
                      MSY = MSY,
@@ -102,6 +115,10 @@ for(i in 1:length(baltic_timeseries)){
   
 }
 
+<<<<<<< HEAD
+
+write.csv(df, file = 'Pella_T_MSY_baltic.csv')
+=======
 # Save parameters to file 
 write.csv(df, file = 'Pella_T_MSY_baltic.csv')
 
@@ -109,3 +126,4 @@ write.csv(df, file = 'Pella_T_MSY_baltic.csv')
 # Test the stuff 
 plot(rep$value[names(rep$value) == 'Bpred'])
 lines(df.tmb$Biomass)
+>>>>>>> fdb87d2bdf3169be8261415ed1cd3e3d01094d5f

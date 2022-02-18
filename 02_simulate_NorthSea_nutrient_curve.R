@@ -1,7 +1,7 @@
 pacman::p_load(mizer, tidyverse, skimr, cowplot, here, funk, install=TRUE)
 theme_set(theme_bw())
 
-## Goal: simulate North Sea community under historic fishing pressure
+## Goal: simulate North Sea community under varying fishing pressure
 
 # Reference guides:
 # https://github.com/sizespectrum/mizer
@@ -10,16 +10,13 @@ theme_set(theme_bw())
 ## load nutrient profiles
 nutrients<-read.csv(file = 'nutrient_profiles.csv')
 
-
 ## for north sea species (n = 12), data on w_inf, w_mat, beta, sigma, k_vb and R_max are provided
 
 ## load calibrated North Sea model
 load(file = 'NorthSea_calibrated.rds')
 
-
 ##clean some params
 params@gear_params$initial_effort<-NULL
-
 
 ### set starting effort position = simulated FMSY
 start_effort<-t(as.matrix(fmsy$fmsy))
@@ -39,18 +36,17 @@ unfish_ref<-sum(unfish.biom$unfished_biomass)
 ## and shift F by a multiplier (not set at fixed value for all species)
 f=seq(0, 20, by =0.05)
 
-## get F baseline as simulated FMSY£
+## get F baseline as simulated FMSY
 f_base<-start_effort
-
 
 ## empty vectors to be filled in simulations
 yield_species<-numeric() 
 tot_biomass<-numeric() 
 biomass_species<-numeric() 
 mean_weight<-numeric() 
-collapsed<-numeric() 
+cl<-numeric() 
 
-## loop over each f value, simulate to 2050, save 2050 results
+## loop over each f value, simulate to 2100, save 2050 results
 i=0
  repeat{
     i = i + 1
@@ -129,10 +125,10 @@ i=0
     
     y<-y %>% filter(year == 2100) %>% mutate(f = f[i])
     
-    yf<-rbind(yf, y)
-    tb<-rbind(tb, t)
-    bsp<-rbind(bsp, data.frame(bs))
-    mw<-rbind(mw, w)
+    yield_species<-rbind(yield_species, y)
+    tot_biomass<-rbind(tot_biomass, t)
+    biomass_species<-rbind(biomass_species, data.frame(bs))
+    mean_weight<-rbind(mean_weight, w)
     cl<-rbind(cl, collapsed)
   
   if( t$biomass / unfish_ref < 0.1 ){break}
@@ -175,11 +171,12 @@ nut_yield_species<-yield_species %>%
 ## scale total biomass, mean weight and collapsed stocks as proportion of maximum
 tb.scale<-tot_biomass %>% mutate(max.b = max(biomass), b.scale = biomass/max.b) 
 mw.scale<-mean_weight %>% mutate(max.mw = max(mean_weight), mw.scale = mean_weight/max.mw)
-cl.scale<-collapsed %>% mutate(max.cl = 12, cl.scale = n.collapse/max.cl)
+cl.scale<-cl %>% mutate(max.cl = 12, cl.scale = n.collapse/max.cl)
 
 
 ## save all curves in 1 dataframe
 curves<-rbind(y.nut.scale %>% mutate(group = nutrient, value = nut.yield, scaled = nut.scale) %>% select(f, group, value, scaled),
+               y.nut.scale %>% filter(nutrient == 'iron.mg') %>% mutate(group = 'Total yield', value = yield, scaled = yield.scale) %>% select(f, group, value, scaled),
                tb.scale %>% mutate(group= 'Fishable biomass', value = biomass, scaled = b.scale) %>% select(f, group, value, scaled),
                mw.scale %>% mutate(group= 'Mean weight', value = mean_weight, scaled = mw.scale) %>% select(f, group, value, scaled),
                cl.scale %>% mutate(group= 'Collapsed species', value = n.collapse, scaled = cl.scale) %>% select(f, group, value, scaled))
