@@ -4,7 +4,7 @@ theme_set(theme_bw())
 ## Goal: convert Baltic Sea model sim to nutrient yields
 
 ##  load Baltic biomass, yield results
-sim<-read.csv('results/sim/BalticSea_curves.csv')
+sim<-read.csv('BalticSea_curves.csv')
 colnames(sim)<-tolower(colnames(sim))
 sim$species<-str_to_title(sim$species)
 
@@ -18,14 +18,14 @@ flim<-0.28
 yield_species<-sim %>% filter(unit == 'Yield' & f < flim) %>% select(-unit, -fmulti)
 colnames(yield_species)[2]<-'yield'
 
-yield_species$ScientificName<-Baltic_nut$ScientificName[match(yield_species$species, Baltic_nut$species)]
-yield_species$calcium.mg<-nut$Calcium_mu[match(yield_species$ScientificName,nut$species)]
-yield_species$iron.mg<-nut$Iron_mu[match(yield_species$ScientificName,nut$species)]
-yield_species$selenium.mug<-nut$Selenium_mu[match(yield_species$ScientificName,nut$species)]
-yield_species$zinc.mg<-nut$Zinc_mu[match(yield_species$ScientificName,nut$species)]
-yield_species$omega3.g<-nut$Omega_3_mu[match(yield_species$ScientificName,nut$species)]
-yield_species$vitamin_a.mug<-nut$Vitamin_A_mu[match(yield_species$ScientificName,nut$species)]
-yield_species$vitamin_d.mug<-NS_nut$value[NS_nut$nutrient == 'vitamin_d.mug'][match(yield_species$ScientificName,NS_nut$ScientificName[NS_nut$nutrient == 'vitamin_d.mug'])]
+yield_species$ScientificName<-nutrients$ScientificName[match(yield_species$species, nutrients$species)]
+yield_species$calcium.mg<-nutrients$calcium.mg[match(yield_species$ScientificName,nutrients$ScientificName)]
+yield_species$iron.mg<-nutrients$iron.mg[match(yield_species$ScientificName,nutrients$ScientificName)]
+yield_species$selenium.mug<-nutrients$selenium.mug[match(yield_species$ScientificName,nutrients$ScientificName)]
+yield_species$zinc.mg<-nutrients$zinc.mg[match(yield_species$ScientificName,nutrients$ScientificName)]
+yield_species$omega3.g<-nutrients$omega3.g[match(yield_species$ScientificName,nutrients$ScientificName)]
+yield_species$vitamin_a.mug<-nutrients$vitamin_a.mug[match(yield_species$ScientificName,nutrients$ScientificName)]
+yield_species$vitamin_d.mug<-nutrients$value[nutrients$nutrient == 'vitamin_d.mug'][match(yield_species$ScientificName,nutrients$ScientificName[nutrients$nutrient == 'vitamin_d.mug'])]
 
 ## curves, scaled, and weighted versions
 y_nut<-yield_species %>% 
@@ -85,11 +85,11 @@ curves$group<-factor(curves$group,
                                'omega3.g','Total yield', 'Fishable biomass', 'Collapsed species'))
 
 ## save output
-save(
-  yield_species,
-  nut_yield_species,
-  tot_biomass,
-  biomass_species,
-  collapsed,
-  curves,
-file='BalticSea_mMNY_simulated.rds')
+# save(
+#   yield_species,
+#   nut_yield_species,
+#   tot_biomass,
+#   biomass_species,
+#   collapsed,
+#   curves,
+# file='BalticSea_mMNY_simulated.rds')

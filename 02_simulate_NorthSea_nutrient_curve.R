@@ -1,4 +1,4 @@
-pacman::p_load(mizer, tidyverse, skimr, cowplot, here, funk, install=TRUE)
+pacman::p_load(mizer, tidyverse, skimr, cowplot, here, install=TRUE)
 theme_set(theme_bw())
 
 ## Goal: simulate North Sea community under varying fishing pressure
@@ -136,13 +136,13 @@ i=0
 
 ## match in nutrient concentrations
 yield_species$ScientificName<-nutrients$ScientificName[match(yield_species$species, nutrients$species)]
-yield_species$calcium.mg<-nutrients$Calcium_mu[match(yield_species$ScientificName,nutrients$ScientificName_corrected)]
-yield_species$iron.mg<-nutrients$Iron_mu[match(yield_species$ScientificName,nutrients$ScientificName_corrected)]
-yield_species$selenium.mug<-nutrients$Selenium_mu[match(yield_species$ScientificName,nutrients$ScientificName_corrected)]
-yield_species$zinc.mg<-nutrients$Zinc_mu[match(yield_species$ScientificName,nutrients$ScientificName_corrected)]
-yield_species$omega3.g<-nutrients$Omega3_mu[match(yield_species$ScientificName,nutrients$ScientificName_corrected)]
-yield_species$vitamin_a.mug<-nutrients$Vitamin_A_mu[match(yield_species$ScientificName,nutrients$ScientificName_corrected)]
-yield_species$vitamin_d.mug<-nutrients$value[nutrients$nutrient == 'vitamin_d.mug'][match(yield_species$ScientificName,NS_nut$ScientificName[NS_nut$nutrient == 'vitamin_d.mug'])]
+yield_species$calcium.mg<-nutrients$calcium.mg[match(yield_species$ScientificName,nutrients$ScientificName)]
+yield_species$iron.mg<-nutrients$iron.mg[match(yield_species$ScientificName,nutrients$ScientificName)]
+yield_species$selenium.mug<-nutrients$selenium.mug[match(yield_species$ScientificName,nutrients$ScientificName)]
+yield_species$zinc.mg<-nutrients$zinc.mg[match(yield_species$ScientificName,nutrients$ScientificName)]
+yield_species$omega3.g<-nutrients$omega3.g[match(yield_species$ScientificName,nutrients$ScientificName)]
+yield_species$vitamin_a.mug<-nutrients$vitamin_a.mug[match(yield_species$ScientificName,nutrients$ScientificName)]
+yield_species$vitamin_d.mug<-nutrients$value[nutrients$nutrient == 'vitamin_d.mug'][match(yield_species$ScientificName,nutrients$ScientificName[nutrients$nutrient == 'vitamin_d.mug'])]
 
 ## estimate nutrient yields at each F, by species
 y_nut<-yield_species %>% 
@@ -198,13 +198,13 @@ nut_yield_species$f_mort<-f_mort$f_mort[match(nut_yield_species$f, f_mort$f)]
 
 
 ## save output
-save(
-  yield_species,
-  nut_yield_species,
-  tot_biomass,
-  biomass_species,
-  mean_weight,
-  collapsed,
-  curves,
-file='NorthSea_mMNY_simulated.rds')
+# save(
+#   yield_species,
+#   nut_yield_species,
+#   tot_biomass,
+#   biomass_species,
+#   mean_weight,
+#   collapsed,
+#   curves,
+# file='NorthSea_mMNY_simulated.rds')
 

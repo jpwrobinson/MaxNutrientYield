@@ -3,17 +3,22 @@ library(scales)
 library(patchwork)
 
 ## Goal: simulate nutrient yields for generic 10 species community
-
-source('BalticSea_R/baseparameters.R')
-source('BalticSea_R/compareBiomass.R')
-source('BalticSea_R/calcSSB.R')
-source('BalticSea_R/IterateSpectrum.R')
-source('BalticSea_R/calcFishedBiomass.R')
-source('BalticSea_R/plotBiomasstime.R')
-source('BalticSea_R/YieldCalc.R')
+load('BalticSea.Rdata')
+source('baseparameters.R')
+source('compareBiomass.R')
+source('calcSSB.R')
+source('IterateSpectrum.R')
+source('calcFishedBiomass.R')
+source('plotBiomasstime.R')
+source('YieldCalc.R')
 
 
 ## set parameters for 10 species case
+kappaNew <- 694348*1e6 # Convert to gram 
+param <- baseparameters(state$wInf,kappaNew,h = h)
+h <- 3*state$k/(0.6*state$wInf^(-1/3))
+h[is.na(h)] <- mean(h,na.rm=T)
+
 W <- 10^seq(log10(30),log10(15000),length.out = 15) # 10 species in logspace 
 param0 <- baseparameters(W,kappa = 0.005,h = 15)
 param0$F0 <- rep(0,param0$nSpecies)
@@ -90,7 +95,7 @@ df.pp$nut.under <- df.pp$nut.under/max(df.pp$nut.under)
 df.pp$nut.over <- df.pp$nut.over/max(df.pp$nut.over)
 df.pp$nut.equal <- df.pp$nut.equal/max(df.pp$nut.equal)
 
-write.csv(df.pp, file = 'generic_model.csv', row.names=FALSE)
+# write.csv(df.pp, file = 'generic_model.csv', row.names=FALSE)
 
 
 ## plot

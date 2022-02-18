@@ -5,15 +5,15 @@ library(tidyverse)
 ## Goal: simulate Baltic Sea community under varying fishing pressure
 
 ## load data and model parameters
-load('BalticSea_R/Baltic_timeseries.Rdata')
-load('BalticSea_R/BalticSea.Rdata')
-source('BalticSea_R/baseparameters.R')
-source('BalticSea_R/compareBiomass.R')
-source('BalticSea_R/calcSSB.R')
-source('BalticSea_R/IterateSpectrum.R')
-source('BalticSea_R/calcFishedBiomass.R')
-source('BalticSea_R/plotBiomasstime.R')
-source('BalticSea_R/YieldCalc.R')
+load('Baltic_timeseries.Rdata')
+load('BalticSea.Rdata')
+source('baseparameters.R')
+source('compareBiomass.R')
+source('calcSSB.R')
+source('IterateSpectrum.R')
+source('calcFishedBiomass.R')
+source('plotBiomasstime.R')
+source('YieldCalc.R')
 
 
 kappaNew <- 694348*1e6 # Convert to gram 
@@ -27,14 +27,14 @@ param$v <- param$h*cV
 param$F0 <- state$F0
 param$fishing <- "Trawl"
 param$tEnd <- 120
-Rmax <- as.numeric(as.matrix(read.table('BalticSea_R/Rmax_Baltic.csv')))*1e6
+Rmax <- as.numeric(as.matrix(read.table('Rmax_Baltic.csv')))*1e6
 param$Rmax <- Rmax
 param$eRepro <- matrix(0.01,param$nSpecies)
 param$eRepro[3] <- 0.001
 
 
 ## get species-fmsy from PellaT model
-fmsy<-read.csv('BalticSea_R/Pella_T_MSY_baltic.csv') %>% mutate(F0 = Fmsy)
+fmsy<-read.csv('Pella_T_MSY_baltic.csv') %>% mutate(F0 = Fmsy)
 
 # fix order
 fmsy<-fmsy[c(3,2,1),]
@@ -95,8 +95,12 @@ df.export <- df.save %>% pivot_longer(cols = 1:4, names_to = 'Unit')  %>%
       select(-Fmsy, -F0) ## drop other F metrics too confusing
 
 ggplot(df.export, aes(x = F, y = value/1e6, color = Species))+
-facet_wrap(~Unit, scales='free')+geom_line()+theme_classic()+
-  scale_y_continuous('tonnes')#+coord_cartesian(ylim = c(0,4e6))
+  facet_wrap(~Unit, scales='free')+ 
+  geom_line() +
+  scale_y_continuous('tonnes')
 
-write.csv(df.export, file = 'BalticSea_curves_iter', row.names=FALSE)
-ggplot(df.export %>% filter(Unit=="Yield"), aes(x = F, y = value, color = Species))+geom_line()+theme_bw()
+ggplot(df.export %>% filter(Unit=="Yield"), aes(x = F, y = value, color = Species))+
+    geom_line()
+
+# write.csv(df.export, file = 'BalticSea_curves', row.names=FALSE)
+
